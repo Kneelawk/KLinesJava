@@ -1,0 +1,10 @@
+/.gradle/
+/.idea/
+/build/
+/out/
+
+# sometimes things crash and generate log files
+/*.log
+
+*.kate-swp
+*.swp
