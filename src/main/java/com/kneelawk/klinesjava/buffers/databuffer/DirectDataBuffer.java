@@ -1,4 +1,4 @@
-package com.kneelawk.klinesjava.buffers;
+package com.kneelawk.klinesjava.buffers.databuffer;
 
 import org.lwjgl.system.Pointer;
 
@@ -6,7 +6,7 @@ import java.io.Closeable;
 
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class DirectBufferObject extends AbstractReadableWritableNativeBufferObject implements Pointer, Closeable {
+public class DirectDataBuffer extends AbstractReadableWritableNativeDataBuffer implements Pointer, Closeable {
     private long initialAllocation;
     private long initialTmpAllocation;
     private long backing;
@@ -14,15 +14,15 @@ public class DirectBufferObject extends AbstractReadableWritableNativeBufferObje
     private long backingSize;
     private long tmpSize;
 
-    public DirectBufferObject() {
+    public DirectDataBuffer() {
         this(1024);
     }
 
-    public DirectBufferObject(long initialAllocation) {
+    public DirectDataBuffer(long initialAllocation) {
         this(initialAllocation, initialAllocation < 64 ? initialAllocation : initialAllocation / 2);
     }
 
-    public DirectBufferObject(long initialAllocation, long initialTmpAllocation) {
+    public DirectDataBuffer(long initialAllocation, long initialTmpAllocation) {
         this.initialAllocation = initialAllocation;
         this.initialTmpAllocation = initialTmpAllocation;
         backing = nmemAlloc(initialAllocation);

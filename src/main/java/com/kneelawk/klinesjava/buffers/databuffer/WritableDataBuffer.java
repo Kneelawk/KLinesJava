@@ -1,5 +1,6 @@
-package com.kneelawk.klinesjava.buffers;
+package com.kneelawk.klinesjava.buffers.databuffer;
 
+import com.kneelawk.klinesjava.buffers.BufferObject;
 import org.lwjgl.system.CustomBuffer;
 import org.lwjgl.system.MemoryStack;
 
@@ -8,7 +9,7 @@ import java.nio.*;
 import static com.kneelawk.klinesjava.buffers.ElementShifts.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
-public interface WritableBufferObject extends BufferObject {
+public interface WritableDataBuffer extends BufferObject {
 
     /**
      * Sets a chunk of data within this buffer to the contents of the specified buffer.

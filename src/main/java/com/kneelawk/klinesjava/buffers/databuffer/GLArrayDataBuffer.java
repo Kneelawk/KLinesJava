@@ -1,6 +1,6 @@
-package com.kneelawk.klinesjava.buffers;
+package com.kneelawk.klinesjava.buffers.databuffer;
 
-public interface GLArrayBufferObject {
+public interface GLArrayDataBuffer {
     /**
      * Gets this buffer's OpenGL buffer name.
      *

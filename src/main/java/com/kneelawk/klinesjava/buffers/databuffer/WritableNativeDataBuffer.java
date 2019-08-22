@@ -1,4 +1,4 @@
-package com.kneelawk.klinesjava.buffers;
+package com.kneelawk.klinesjava.buffers.databuffer;
 
 import org.lwjgl.system.CustomBuffer;
 
@@ -6,7 +6,7 @@ import java.nio.Buffer;
 
 import static org.lwjgl.system.MemoryUtil.memAddress;
 
-public interface WritableNativeBufferObject extends WritableBufferObject {
+public interface WritableNativeDataBuffer extends WritableDataBuffer {
 
     /**
      * Sets a chunk of data within this buffer to the contents of the buffer specified by length and address.

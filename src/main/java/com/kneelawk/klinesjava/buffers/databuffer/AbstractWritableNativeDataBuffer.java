@@ -1,6 +1,6 @@
-package com.kneelawk.klinesjava.buffers;
+package com.kneelawk.klinesjava.buffers.databuffer;
 
-public abstract class AbstractWritableNativeBufferObject implements WritableNativeBufferObject {
+public abstract class AbstractWritableNativeDataBuffer implements WritableNativeDataBuffer {
 
     /**
      * The official size of this buffer object.

@@ -1,5 +1,6 @@
-package com.kneelawk.klinesjava.buffers;
+package com.kneelawk.klinesjava.buffers.databuffer;
 
+import com.kneelawk.klinesjava.buffers.BufferObject;
 import org.lwjgl.system.CustomBuffer;
 import org.lwjgl.system.MemoryStack;
 
@@ -8,7 +9,7 @@ import java.nio.*;
 import static com.kneelawk.klinesjava.buffers.ElementShifts.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
-public interface ReadableBufferObject extends BufferObject {
+public interface ReadableDataBuffer extends BufferObject {
 
     /**
      * Reads a chunk of data starting at offset into the buffer.

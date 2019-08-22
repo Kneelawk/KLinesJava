@@ -1,4 +1,4 @@
-package com.kneelawk.klinesjava.buffers;
+package com.kneelawk.klinesjava.buffers.databuffer;
 
 import org.lwjgl.system.MemoryStack;
 
@@ -10,7 +10,7 @@ import static org.lwjgl.opengl.GL43C.glInvalidateBufferData;
 import static org.lwjgl.opengl.GL45C.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
-public class WritableGLArrayBufferObject extends AbstractWritableNativeBufferObject implements GLArrayBufferObject,
+public class WritableGLArrayDataBuffer extends AbstractWritableNativeDataBuffer implements GLArrayDataBuffer,
         Closeable {
     private long initialCapacity;
     private long initialTmpCapacity;
@@ -19,15 +19,15 @@ public class WritableGLArrayBufferObject extends AbstractWritableNativeBufferObj
     private long backingSize;
     private long tmpSize;
 
-    public WritableGLArrayBufferObject() {
+    public WritableGLArrayDataBuffer() {
         this(1024);
     }
 
-    public WritableGLArrayBufferObject(long initialCapacity) {
+    public WritableGLArrayDataBuffer(long initialCapacity) {
         this(initialCapacity, initialCapacity < 64 ? initialCapacity : initialCapacity / 2);
     }
 
-    public WritableGLArrayBufferObject(long initialCapacity, long initialTmpCapacity) {
+    public WritableGLArrayDataBuffer(long initialCapacity, long initialTmpCapacity) {
         this.initialCapacity = initialCapacity;
         this.initialTmpCapacity = initialTmpCapacity;
 

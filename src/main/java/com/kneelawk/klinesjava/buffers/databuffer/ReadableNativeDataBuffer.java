@@ -1,4 +1,4 @@
-package com.kneelawk.klinesjava.buffers;
+package com.kneelawk.klinesjava.buffers.databuffer;
 
 import org.lwjgl.system.CustomBuffer;
 
@@ -6,7 +6,7 @@ import java.nio.Buffer;
 
 import static org.lwjgl.system.MemoryUtil.memAddress;
 
-public interface ReadableNativeBufferObject extends ReadableBufferObject {
+public interface ReadableNativeDataBuffer extends ReadableDataBuffer {
 
     /**
      * Reads a chunk of data starting at offset into the buffer represented by length and address.
