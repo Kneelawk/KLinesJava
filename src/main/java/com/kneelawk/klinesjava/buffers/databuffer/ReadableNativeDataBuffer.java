@@ -15,7 +15,7 @@ public interface ReadableNativeDataBuffer extends ReadableDataBuffer {
      * @param length  the length of the chunk of data to read.
      * @param address the address of the buffer to read the chunk of data into.
      */
-    void readTo(long offset, long length, long address);
+    void readToNative(long offset, long length, long address);
 
     /**
      * Reads a chunk of data starting at offset into the buffer.
@@ -30,7 +30,7 @@ public interface ReadableNativeDataBuffer extends ReadableDataBuffer {
             throw new IllegalArgumentException("This buffer only supports direct java nio buffers");
         }
 
-        readTo(offset, ((long) buffer.remaining()) << ((long) elementShift), memAddress(buffer));
+        readToNative(offset, ((long) buffer.remaining()) << ((long) elementShift), memAddress(buffer));
     }
 
     /**
@@ -41,6 +41,6 @@ public interface ReadableNativeDataBuffer extends ReadableDataBuffer {
      */
     @Override
     default void readTo(long offset, CustomBuffer<?> buffer) {
-        readTo(offset, ((long) buffer.remaining()) * ((long) buffer.sizeof()), memAddress(buffer));
+        readToNative(offset, ((long) buffer.remaining()) * ((long) buffer.sizeof()), memAddress(buffer));
     }
 }

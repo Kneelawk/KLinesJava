@@ -44,7 +44,7 @@ public abstract class AbstractReadableNativeDataBuffer implements ReadableNative
      * @param address the address of the buffer to read the chunk of data into.
      */
     @Override
-    public void readTo(long offset, long length, long address) {
+    public void readToNative(long offset, long length, long address) {
         if (offset < 0) {
             throw new IllegalArgumentException("Offset cannot be less than zero");
         }
