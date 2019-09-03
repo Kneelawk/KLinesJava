@@ -15,7 +15,8 @@ mainClassName = "$moduleName/com.kneelawk.klinesjava.KLinesJavaMain"
 
 project.ext.guavaVersion = '28.0-jre'
 project.ext.jomlVersion = '1.9.16'
-project.ext.lwjglVersion = "3.2.2"
+project.ext.lwjglVersion = '3.2.2'
+project.ext.junitVersion = '5.5.1'
 
 switch (OperatingSystem.current()) {
 	case OperatingSystem.LINUX:
@@ -54,6 +55,9 @@ dependencies {
 	runtimeOnly "org.lwjgl:lwjgl-openal:$lwjglVersion:$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
+
+	testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+	testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
 
 run {
@@ -66,4 +70,8 @@ jlink {
 		name = 'KLinesJava'
 		jvmArgs = ['--add-modules', nativeModules]
 	}
+}
+
+test {
+	useJUnitPlatform()
 }
