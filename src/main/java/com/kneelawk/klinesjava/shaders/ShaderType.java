@@ -44,6 +44,7 @@ public enum ShaderType {
 
     /**
      * Gets the OpenGL constant value of this type.
+     *
      * @return the OpenGL constant value of this type.
      */
     public int getTypeId() {

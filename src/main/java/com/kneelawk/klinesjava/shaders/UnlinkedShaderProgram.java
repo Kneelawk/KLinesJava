@@ -29,7 +29,7 @@ public class UnlinkedShaderProgram {
     /**
      * Creates this UnlinkedShaderProgram with the given name and {@link ShaderComponent}s.
      *
-     * @param name the name of this UnlinkedShaderProgram.
+     * @param name       the name of this UnlinkedShaderProgram.
      * @param components the collection of components in this UnlinkedShaderProgram.
      */
     public UnlinkedShaderProgram(String name, Collection<ShaderComponent> components) {
@@ -61,6 +61,7 @@ public class UnlinkedShaderProgram {
 
     /**
      * Gets a set of all the {@link ShaderComponent}s in this UnlinkedShaderProgram.
+     *
      * @return a set of all the {@link ShaderComponent}s in this UnlinkedShaderProgram.
      */
     public Set<ShaderComponent> getComponents() {
@@ -69,6 +70,7 @@ public class UnlinkedShaderProgram {
 
     /**
      * Sets the set of {@link ShaderComponent}s in this UnlinkedShaderProgram.
+     *
      * @param components the new set of {@link ShaderComponent}s for this UnlinkedShaderProgram.
      * @return this
      */
@@ -80,6 +82,7 @@ public class UnlinkedShaderProgram {
 
     /**
      * Sets the set of {@link ShaderComponent}s in this UnlinkedShaderProgram.
+     *
      * @param components the new set of {@link ShaderComponent}s for this UnlinkedShaderProgram.
      * @return this
      */
@@ -91,6 +94,7 @@ public class UnlinkedShaderProgram {
 
     /**
      * Add a single {@link ShaderComponent} to this UnlinkedShaderProgram.
+     *
      * @param component the {@link ShaderComponent} to add.
      * @return this
      */
@@ -101,6 +105,7 @@ public class UnlinkedShaderProgram {
 
     /**
      * Add an array of {@link ShaderComponent}s to this UnlinkedShaderProgram.
+     *
      * @param components the {@link ShaderComponent}s to add.
      * @return this
      */
@@ -111,6 +116,7 @@ public class UnlinkedShaderProgram {
 
     /**
      * Add a collection of {@link ShaderComponent}s to this UnlinkedShaderProgram.
+     *
      * @param components the {@link ShaderComponent}s to add.
      * @return this
      */
@@ -121,6 +127,7 @@ public class UnlinkedShaderProgram {
 
     /**
      * Link this UnlinkedShaderProgram into a {@link ShaderProgram}.
+     *
      * @return the linked {@link ShaderProgram}.
      * @throws ProgramLinkException if there was an error while linking.
      * @see ShaderProgram
@@ -131,7 +138,8 @@ public class UnlinkedShaderProgram {
 
     /**
      * Link the given {@link ShaderComponent}s into a {@link ShaderProgram}.
-     * @param name the name of this program for the purpose of logging and error messages.
+     *
+     * @param name       the name of this program for the purpose of logging and error messages.
      * @param components the collection of components to link.
      * @return the linked {@link ShaderProgram}.
      * @throws ProgramLinkException if there was an error while linking.

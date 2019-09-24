@@ -19,15 +19,15 @@ project.ext.lwjglVersion = '3.2.2'
 project.ext.junitVersion = '5.5.1'
 
 switch (OperatingSystem.current()) {
-	case OperatingSystem.LINUX:
-		project.ext.lwjglNatives = "natives-linux"
-		break
-	case OperatingSystem.MAC_OS:
-		project.ext.lwjglNatives = "natives-macos"
-		break
-	case OperatingSystem.WINDOWS:
-		project.ext.lwjglNatives = "natives-windows"
-		break
+    case OperatingSystem.LINUX:
+        project.ext.lwjglNatives = "natives-linux"
+        break
+    case OperatingSystem.MAC_OS:
+        project.ext.lwjglNatives = "natives-macos"
+        break
+    case OperatingSystem.WINDOWS:
+        project.ext.lwjglNatives = "natives-windows"
+        break
 }
 
 project.ext.nativeModules = 'org.lwjgl.natives,org.lwjgl.glfw.natives,org.lwjgl.opengl.natives'
@@ -39,39 +39,39 @@ repositories {
 dependencies {
     implementation "com.google.guava:guava:$guavaVersion"
 
-	implementation "org.joml:joml:$jomlVersion"
-    
-    implementation "org.lwjgl:lwjgl:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-assimp:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-jemalloc:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-openal:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-opengl:$lwjglVersion"
-	implementation "org.lwjgl:lwjgl-stb:$lwjglVersion"
-	runtimeOnly "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
-	runtimeOnly "org.lwjgl:lwjgl-assimp:$lwjglVersion:$lwjglNatives"
-	runtimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
-	runtimeOnly "org.lwjgl:lwjgl-jemalloc:$lwjglVersion:$lwjglNatives"
-	runtimeOnly "org.lwjgl:lwjgl-openal:$lwjglVersion:$lwjglNatives"
-	runtimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
-	runtimeOnly "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
+    implementation "org.joml:joml:$jomlVersion"
 
-	testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
-	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    implementation "org.lwjgl:lwjgl:$lwjglVersion"
+    implementation "org.lwjgl:lwjgl-assimp:$lwjglVersion"
+    implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion"
+    implementation "org.lwjgl:lwjgl-jemalloc:$lwjglVersion"
+    implementation "org.lwjgl:lwjgl-openal:$lwjglVersion"
+    implementation "org.lwjgl:lwjgl-opengl:$lwjglVersion"
+    implementation "org.lwjgl:lwjgl-stb:$lwjglVersion"
+    runtimeOnly "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-assimp:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-jemalloc:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-openal:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
 
 run {
-	jvmArgs('--add-modules', nativeModules)
+    jvmArgs('--add-modules', nativeModules)
 }
 
 jlink {
-	options = ['--compress', 2, '--no-header-files', '--no-man-pages', '--add-modules', nativeModules]
-	launcher {
-		name = 'KLinesJava'
-		jvmArgs = ['--add-modules', nativeModules]
-	}
+    options = ['--compress', 2, '--no-header-files', '--no-man-pages', '--add-modules', nativeModules]
+    launcher {
+        name = 'KLinesJava'
+        jvmArgs = ['--add-modules', nativeModules]
+    }
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

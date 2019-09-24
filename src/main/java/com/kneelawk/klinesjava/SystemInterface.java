@@ -5,6 +5,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class SystemInterface {
     /**
      * Initializes the GLFW system interface and context.
+     *
      * @throws EngineException if initializing GLFW failed
      */
     public static void init() throws EngineException {

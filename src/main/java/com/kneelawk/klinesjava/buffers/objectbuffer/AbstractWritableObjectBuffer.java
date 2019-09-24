@@ -1,7 +1,5 @@
 package com.kneelawk.klinesjava.buffers.objectbuffer;
 
-import com.kneelawk.klinesjava.graphics.Vertex;
-
 import java.util.Collection;
 
 public abstract class AbstractWritableObjectBuffer<E> implements WritableObjectBuffer<E> {
