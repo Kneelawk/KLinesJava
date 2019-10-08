@@ -5,12 +5,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.kneelawk.klinesjava.buffers.ElementShifts;
-import com.kneelawk.klinesjava.buffers.databuffer.DirectDataBuffer;
+import com.kneelawk.klinesjava.buffers.databuffer.CachingWrappingDataBuffer;
+import com.kneelawk.klinesjava.buffers.databuffer.ReadableWritableDataBuffer;
 import com.kneelawk.klinesjava.buffers.databuffer.WritableDataBuffer;
 import com.kneelawk.klinesjava.utils.CollectionUtils;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.*;
 
@@ -19,8 +21,7 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>, Closeable {
     private static final int COPY_CHUNK_SIZE = 64;
 
-    private WritableDataBuffer indexBuffer;
-    private DirectDataBuffer readableIndexBuffer = new DirectDataBuffer();
+    private ReadableWritableDataBuffer indexBuffer;
 
     private WritableObjectBuffer<E> elementBuffer;
     private List<E> readableElementBuffer = Lists.newArrayList();
@@ -31,7 +32,11 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
 
     public WritableIndexingObjectBuffer(WritableDataBuffer indexBuffer,
                                         WritableObjectBuffer<E> elementBuffer) {
-        this.indexBuffer = indexBuffer;
+        if (indexBuffer instanceof ReadableWritableDataBuffer) {
+            this.indexBuffer = (ReadableWritableDataBuffer) indexBuffer;
+        } else {
+            this.indexBuffer = new CachingWrappingDataBuffer(indexBuffer);
+        }
         this.elementBuffer = elementBuffer;
     }
 
@@ -137,7 +142,6 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
         }
 
         indexBuffer.appendBlank(length << ElementShifts.ELEMENT_SHIFT_INT);
-        readableIndexBuffer.appendBlank(length << ElementShifts.ELEMENT_SHIFT_INT);
     }
 
     /**
@@ -195,7 +199,6 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
         }
 
         indexBuffer.prependBlank(length << ElementShifts.ELEMENT_SHIFT_INT);
-        readableIndexBuffer.prependBlank(length << ElementShifts.ELEMENT_SHIFT_INT);
 
         elementUses.forEach(uses -> CollectionUtils.replaceAll(uses, position -> position + length));
     }
@@ -281,8 +284,6 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
         long size = getSize();
 
         indexBuffer.insertBlank(offset << ElementShifts.ELEMENT_SHIFT_INT, length << ElementShifts.ELEMENT_SHIFT_INT);
-        readableIndexBuffer
-                .insertBlank(offset << ElementShifts.ELEMENT_SHIFT_INT, length << ElementShifts.ELEMENT_SHIFT_INT);
 
         if (offset < size) {
             elementUses.forEach(
@@ -662,7 +663,6 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
     @Override
     public void clear() {
         indexBuffer.clear();
-        readableIndexBuffer.clear();
 
         elementBuffer.clear();
         readableElementBuffer.clear();
@@ -680,7 +680,7 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
      */
     @Override
     public long getSize() {
-        return readableIndexBuffer.getSize() >> ElementShifts.ELEMENT_SHIFT_INT;
+        return indexBuffer.getSize() >> ElementShifts.ELEMENT_SHIFT_INT;
     }
 
     /**
@@ -710,8 +710,10 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
      * method has no effect.
      */
     @Override
-    public void close() {
-        readableIndexBuffer.close();
+    public void close() throws IOException {
+        if (indexBuffer instanceof Closeable) {
+            ((Closeable) indexBuffer).close();
+        }
     }
 
     private void putIndices(long offset, long length, PrimitiveIterator.OfInt it) {
@@ -733,7 +735,6 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
 
                 // set the new indices
                 indexBuffer.set((offset + i * COPY_CHUNK_SIZE) << ElementShifts.ELEMENT_SHIFT_INT, buffer);
-                readableIndexBuffer.set((offset + i * COPY_CHUNK_SIZE) << ElementShifts.ELEMENT_SHIFT_INT, buffer);
             }
 
             // copy the remainder
@@ -747,7 +748,6 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
 
                 // set the new indices
                 indexBuffer.set((offset + chunks * COPY_CHUNK_SIZE) << ElementShifts.ELEMENT_SHIFT_INT, buffer);
-                readableIndexBuffer.set((offset + chunks * COPY_CHUNK_SIZE) << ElementShifts.ELEMENT_SHIFT_INT, buffer);
             }
         }
     }
@@ -755,7 +755,6 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
     private void putIndex(long offset, int index) {
         // set new index
         indexBuffer.set(offset << ElementShifts.ELEMENT_SHIFT_INT, index);
-        readableIndexBuffer.set(offset << ElementShifts.ELEMENT_SHIFT_INT, index);
         elementUses.get(index).add(offset);
     }
 
@@ -776,7 +775,7 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
                     long pieceOffset = i * COPY_CHUNK_SIZE + j;
                     elementUses.get(index).add(pieceOffset);
                     if (pieceOffset < size &&
-                            index != readableIndexBuffer.readInt(pieceOffset << ElementShifts.ELEMENT_SHIFT_INT)) {
+                            index != indexBuffer.readInt(pieceOffset << ElementShifts.ELEMENT_SHIFT_INT)) {
                         removeIndexReference(pieceOffset);
                     }
                     buffer.put(j, index);
@@ -784,7 +783,6 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
 
                 // set the new indices
                 indexBuffer.set((offset + i * COPY_CHUNK_SIZE) << ElementShifts.ELEMENT_SHIFT_INT, buffer);
-                readableIndexBuffer.set((offset + i * COPY_CHUNK_SIZE) << ElementShifts.ELEMENT_SHIFT_INT, buffer);
             }
 
             // copy the remainder
@@ -795,7 +793,7 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
                     long pieceOffset = chunks * COPY_CHUNK_SIZE + i;
                     elementUses.get(index).add(pieceOffset);
                     if (pieceOffset < size &&
-                            index != readableIndexBuffer.readInt(pieceOffset << ElementShifts.ELEMENT_SHIFT_INT)) {
+                            index != indexBuffer.readInt(pieceOffset << ElementShifts.ELEMENT_SHIFT_INT)) {
                         removeIndexReference(pieceOffset);
                     }
                     buffer.put(i, index);
@@ -803,19 +801,17 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
 
                 // set the new indices
                 indexBuffer.set((offset + chunks * COPY_CHUNK_SIZE) << ElementShifts.ELEMENT_SHIFT_INT, buffer);
-                readableIndexBuffer.set((offset + chunks * COPY_CHUNK_SIZE) << ElementShifts.ELEMENT_SHIFT_INT, buffer);
             }
         }
     }
 
     private void replaceIndex(long offset, int index) {
-        if (index != readableIndexBuffer.readInt(offset << ElementShifts.ELEMENT_SHIFT_INT)) {
+        if (index != indexBuffer.readInt(offset << ElementShifts.ELEMENT_SHIFT_INT)) {
             // remove old index
             removeIndexReference(offset);
 
             // set new index
             indexBuffer.set(offset << ElementShifts.ELEMENT_SHIFT_INT, index);
-            readableIndexBuffer.set(offset << ElementShifts.ELEMENT_SHIFT_INT, index);
             elementUses.get(index).add(offset);
         }
     }
@@ -838,18 +834,14 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
     }
 
     private void removeIndices(long position, long length) {
-        // remove from backing buffer
-        indexBuffer.remove(position << ElementShifts.ELEMENT_SHIFT_INT, length << ElementShifts.ELEMENT_SHIFT_INT);
-
         // go through every index being removed and remove it
         for (long incrementalPosition = position; incrementalPosition < position + length; incrementalPosition++) {
             // remove all references to this index
             removeIndexReference(incrementalPosition);
         }
 
-        // remove the whole chunk from internal buffer
-        readableIndexBuffer
-                .remove(position << ElementShifts.ELEMENT_SHIFT_INT, length << ElementShifts.ELEMENT_SHIFT_INT);
+        // remove from backing buffer
+        indexBuffer.remove(position << ElementShifts.ELEMENT_SHIFT_INT, length << ElementShifts.ELEMENT_SHIFT_INT);
 
         // decrement all the reverse references to account for the indices shifting back in the index buffer
         elementUses.forEach(uses -> CollectionUtils
@@ -857,14 +849,11 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
     }
 
     private void removeIndex(long position) {
-        // remove from backing buffer
-        indexBuffer.remove(position << ElementShifts.ELEMENT_SHIFT_INT, ElementShifts.ELEMENT_SIZE_INT);
-
         // remove all references to this index
         removeIndexReference(position);
 
-        // remove from internal buffer
-        readableIndexBuffer.remove(position << ElementShifts.ELEMENT_SHIFT_INT, ElementShifts.ELEMENT_SIZE_INT);
+        // remove from backing buffer
+        indexBuffer.remove(position << ElementShifts.ELEMENT_SHIFT_INT, ElementShifts.ELEMENT_SIZE_INT);
 
         // decrement all reverse references to account for the indices shifting back in the index buffer
         elementUses.forEach(eachUses -> CollectionUtils
@@ -873,7 +862,7 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
 
     private void removeIndexReference(long position) {
         // get the index so we can remove things with it
-        int index = readableIndexBuffer.readInt(position << ElementShifts.ELEMENT_SHIFT_INT);
+        int index = indexBuffer.readInt(position << ElementShifts.ELEMENT_SHIFT_INT);
 
         // only handle indices that are actually valid
         if (index >= 0 && index < readableElementBuffer.size()) {
@@ -891,6 +880,14 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
         }
     }
 
+    /**
+     * Removes an element from the underlying element buffer.
+     *
+     * @param index the index of the element to remove.
+     * @deprecated The removal of elements from the underlying buffer should be avoided because it forces a shift of all
+     * elements after the removed element.
+     */
+    @Deprecated
     private void removeElement(int index) {
         // remove this element from the backing
         elementBuffer.remove(index, 1);
@@ -914,8 +911,7 @@ public class WritableIndexingObjectBuffer<E> implements WritableObjectBuffer<E>,
         // collect all the indices that reference elements after the removed element and decrement them
         for (long laterReferencePosition : Iterables.concat(elementUses.subList(index, elementUses.size()))) {
             long laterReferenceBufferPosition = laterReferencePosition << ElementShifts.ELEMENT_SHIFT_INT;
-            int newLaterIndex = readableIndexBuffer.readInt(laterReferenceBufferPosition) - 1;
-            readableIndexBuffer.set(laterReferenceBufferPosition, newLaterIndex);
+            int newLaterIndex = indexBuffer.readInt(laterReferenceBufferPosition) - 1;
             indexBuffer.set(laterReferenceBufferPosition, newLaterIndex);
         }
     }
